@@ -90,5 +90,4 @@ FAISS for vector search
 
 Streamlit for the web UI
 
-yaml
-Copy code
+
