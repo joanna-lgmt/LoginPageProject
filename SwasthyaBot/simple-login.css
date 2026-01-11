@@ -1,0 +1,21 @@
+:root{--bg:#f3f6fb;--card:#ffffff;--accent:#0b5cff;--muted:#6b7280}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#0f172a}
+.container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{width:100%;max-width:420px;background:var(--card);padding:28px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08)}
+.card h1{margin:0 0 18px 0;font-size:20px}
+.field{margin-bottom:14px}
+.field label{display:block;margin-bottom:6px;color:var(--muted);font-size:14px}
+.field input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e6e9ef;font-size:15px}
+.password-row{display:flex;gap:8px;align-items:center}
+.btn-ghost{background:transparent;border:0;color:var(--accent);cursor:pointer;padding:8px;border-radius:8px}
+.row.between{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.checkbox{display:flex;align-items:center;gap:8px}
+.primary{width:100%;background:var(--accent);color:#fff;padding:10px 12px;border-radius:8px;border:0;font-weight:600;cursor:pointer}
+.primary:disabled{opacity:.7;cursor:default}
+.muted{color:var(--muted);text-decoration:none}
+.small{font-size:13px}
+.message{min-height:1.2em;margin-bottom:6px;color:#b91c1c}
+.success{color:#0f5132}
+@media(max-width:480px){.card{padding:20px;border-radius:10px}}

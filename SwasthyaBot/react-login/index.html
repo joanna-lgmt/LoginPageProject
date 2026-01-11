@@ -1,0 +1,129 @@
+<!doctype html>
+<!--
+  Zero-install demo: React + ReactDOM via CDN and Babel standalone to compile JSX in-browser.
+  Open this file directly in your browser (double-click) to test the login page using the mock auth.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Login - Demo (No install)</title>
+  <link rel="stylesheet" href="src/index.css">
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- React and ReactDOM (development builds) -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel standalone compiles JSX in the browser (dev only) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Inline JSX demo. Uses mock auth (user@example.com / password123). -->
+    <script type="text/babel">
+      const { useState, useEffect } = React
+
+      function Login(){
+        const [email, setEmail] = useState('')
+        const [password, setPassword] = useState('')
+        const [remember, setRemember] = useState(false)
+        const [showPassword, setShowPassword] = useState(false)
+        const [loading, setLoading] = useState(false)
+        const [error, setError] = useState('')
+        const [success, setSuccess] = useState('')
+
+        const validate = () => {
+          if (!email) return 'Email is required.'
+          if (!/\S+@\S+\.\S+/.test(email)) return 'Enter a valid email.'
+          if (!password) return 'Password is required.'
+          if (password.length < 6) return 'Password must be at least 6 characters.'
+          return ''
+        }
+
+        const handleSubmit = async (e) => {
+          e.preventDefault()
+          setError('')
+          setSuccess('')
+          const v = validate()
+          if (v) {
+            setError(v)
+            return
+          }
+          setLoading(true)
+
+          // Demo-only mock auth (no network).
+          await new Promise((r) => setTimeout(r, 600))
+          if (email === 'user@example.com' && password === 'password123'){
+            setSuccess('Login successful (mock)')
+            if (remember) localStorage.setItem('rememberedEmail', email)
+            else localStorage.removeItem('rememberedEmail')
+          } else {
+            setError('Invalid email or password.')
+          }
+
+          setLoading(false)
+        }
+
+        useEffect(() => {
+          const saved = localStorage.getItem('rememberedEmail')
+          if (saved) setEmail(saved)
+        }, [])
+
+        return (
+          <main className="login-page" aria-labelledby="login-heading">
+            <form className="login-card" onSubmit={handleSubmit} noValidate>
+              <h1 id="login-heading">Sign in to your account</h1>
+
+              <div className="field">
+                <label htmlFor="email">Email</label>
+                <input id="email" name="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} aria-required="true" />
+              </div>
+
+              <div className="field">
+                <label htmlFor="password">Password</label>
+                <div className="password-row">
+                  <input id="password" name="password" type={showPassword?'text':'password'} value={password} onChange={e=>setPassword(e.target.value)} aria-required="true" />
+                  <button type="button" className="toggle" onClick={()=>setShowPassword(s=>!s)}>{showPassword? 'Hide':'Show'}</button>
+                </div>
+              </div>
+
+              <div className="row small">
+                <label className="checkbox"><input type="checkbox" checked={remember} onChange={e=>setRemember(e.target.checked)} /> Remember me</label>
+                <a className="muted" href="#forgot">Forgot password?</a>
+              </div>
+
+              <div aria-live="polite" className="error" role="status">{error}</div>
+              <div aria-live="polite" className="success" role="status" style={{color:'#166534'}}>{success}</div>
+
+              <button className="primary" type="submit" disabled={loading}>{loading? 'Signing in...':'Sign in'}</button>
+
+              <div className="signup small muted">Don't have an account? <a href="#signup">Sign up</a></div>
+            </form>
+          </main>
+        )
+      }
+
+      function App(){
+        return React.createElement('div',{className:'app-root'}, React.createElement(Login))
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById('root'))
+      root.render(React.createElement(App))
+    </script>
+    <!-- Simple on-page logger for quick debugging when using Live Server or opening file:// -->
+    <div id="debug" style="position:fixed;right:12px;bottom:12px;max-width:320px;padding:10px;background:rgba(0,0,0,0.7);color:#fff;border-radius:8px;font-size:13px;display:none;z-index:9999"></div>
+    <script>
+      const dbg = document.getElementById('debug')
+      function showDebug(msg){ dbg.style.display='block'; dbg.textContent = msg }
+      window.addEventListener('error', (e) => {
+        showDebug('Error: ' + (e.message || e))
+        console.error(e.error || e.message || e)
+      })
+      window.addEventListener('unhandledrejection', (e) => {
+        showDebug('Promise rejection: ' + (e.reason && e.reason.message ? e.reason.message : e.reason))
+        console.error(e)
+      })
+      console.log('Demo loaded — open browser console for logs. Use user@example.com / password123 to sign in.')
+    </script>
+  </body>
+</html>

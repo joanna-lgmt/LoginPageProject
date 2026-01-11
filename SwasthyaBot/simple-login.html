@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simple Login Demo</title>
+    <link rel="stylesheet" href="simple-login.css">
+  </head>
+  <body>
+    <main class="container">
+      <form id="loginForm" class="card" novalidate>
+        <h1>Sign in</h1>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="password-row">
+            <input id="password" name="password" type="password" autocomplete="current-password" required />
+            <button id="togglePwd" type="button" class="btn-ghost" aria-pressed="false">Show</button>
+          </div>
+        </div>
+
+        <div class="row between small">
+          <label class="checkbox"><input id="remember" type="checkbox"/> Remember me</label>
+          <a href="#forgot" class="muted">Forgot?</a>
+        </div>
+
+        <div id="message" role="status" aria-live="polite" class="message"></div>
+
+        <button id="submitBtn" class="primary" type="submit">Sign in</button>
+
+        <p class="muted small">Demo credentials: <strong>user@example.com</strong> / <strong>password123</strong></p>
+      </form>
+    </main>
+
+    <script src="simple-login.js"></script>
+  </body>
+</html>

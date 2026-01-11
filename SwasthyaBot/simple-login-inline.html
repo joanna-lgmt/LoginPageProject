@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simple Login Demo (single file)</title>
+  <style>
+    :root{--bg:#f3f6fb;--card:#ffffff;--accent:#0b5cff;--muted:#6b7280}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#0f172a}
+    .container{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{width:100%;max-width:420px;background:var(--card);padding:28px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08)}
+    .card h1{margin:0 0 18px 0;font-size:20px}
+    .field{margin-bottom:14px}
+    .field label{display:block;margin-bottom:6px;color:var(--muted);font-size:14px}
+    .field input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #e6e9ef;font-size:15px}
+    .password-row{display:flex;gap:8px;align-items:center}
+    .btn-ghost{background:transparent;border:0;color:var(--accent);cursor:pointer;padding:8px;border-radius:8px}
+    .row.between{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .checkbox{display:flex;align-items:center;gap:8px}
+    .primary{width:100%;background:var(--accent);color:#fff;padding:10px 12px;border-radius:8px;border:0;font-weight:600;cursor:pointer}
+    .primary:disabled{opacity:.7;cursor:default}
+    .muted{color:var(--muted);text-decoration:none}
+    .small{font-size:13px}
+    .message{min-height:1.2em;margin-bottom:6px;color:#b91c1c}
+    .success{color:#0f5132}
+    @media(max-width:480px){.card{padding:20px;border-radius:10px}}
+    /* debug box */
+    #debug{position:fixed;right:12px;bottom:12px;max-width:320px;padding:10px;background:rgba(0,0,0,0.75);color:#fff;border-radius:8px;font-size:13px;display:none;z-index:9999}
+  </style>
+</head>
+<body>
+  <main class="container">
+    <form id="loginForm" class="card" novalidate>
+      <h1>Sign in</h1>
+
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" inputmode="email" autocomplete="email" required />
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="password-row">
+          <input id="password" name="password" type="password" autocomplete="current-password" required />
+          <button id="togglePwd" type="button" class="btn-ghost" aria-pressed="false">Show</button>
+        </div>
+      </div>
+
+      <div class="row between small">
+        <label class="checkbox"><input id="remember" type="checkbox"/> Remember me</label>
+        <a href="#forgot" class="muted">Forgot?</a>
+      </div>
+
+      <div id="message" role="status" aria-live="polite" class="message"></div>
+
+      <button id="submitBtn" class="primary" type="submit">Sign in</button>
+
+      <p class="muted small">Demo credentials: <strong>user@example.com</strong> / <strong>password123</strong></p>
+    </form>
+  </main>
+
+  <div id="debug"></div>
+
+  <script>
+    (function(){
+      const form = document.getElementById('loginForm')
+      const emailInput = document.getElementById('email')
+      const pwdInput = document.getElementById('password')
+      const toggleBtn = document.getElementById('togglePwd')
+      const rememberChk = document.getElementById('remember')
+      const messageEl = document.getElementById('message')
+      const submitBtn = document.getElementById('submitBtn')
+      const debugEl = document.getElementById('debug')
+
+      // Demo credentials
+      const DEMO_EMAIL = 'user@example.com'
+      const DEMO_PWD = 'password123'
+
+      function showDebug(msg){ debugEl.style.display='block'; debugEl.textContent = msg }
+
+      window.addEventListener('error', (e) => {
+        try { showDebug('Error: ' + (e.message || e)) }catch(e){}
+        console.error(e.error || e.message || e)
+      })
+      window.addEventListener('unhandledrejection', (e) => {
+        try{ showDebug('Promise rejection: ' + (e.reason && e.reason.message ? e.reason.message : e.reason)) }catch(e){}
+        console.error(e)
+      })
+
+      // Initialize from localStorage
+      try{
+        const saved = localStorage.getItem('rememberedEmail')
+        if (saved) {
+          emailInput.value = saved
+          rememberChk.checked = true
+        }
+      }catch(e){console.warn('localStorage not available', e)}
+
+      // Toggle password visibility
+      toggleBtn.addEventListener('click', () => {
+        const showing = pwdInput.type === 'text'
+        pwdInput.type = showing ? 'password' : 'text'
+        toggleBtn.textContent = showing ? 'Show' : 'Hide'
+        toggleBtn.setAttribute('aria-pressed', String(!showing))
+      })
+
+      function validate(){
+        if (!emailInput.value) return 'Email is required.'
+        if (!/\S+@\S+\.\S+/.test(emailInput.value)) return 'Enter a valid email.'
+        if (!pwdInput.value) return 'Password is required.'
+        if (pwdInput.value.length < 6) return 'Password must be at least 6 characters.'
+        return ''
+      }
+
+      async function handleSubmit(e){
+        e.preventDefault()
+        messageEl.textContent = ''
+        messageEl.classList.remove('success')
+
+        const v = validate()
+        if (v){ messageEl.textContent = v; return }
+
+        submitBtn.disabled = true
+        submitBtn.textContent = 'Signing in...'
+
+        await new Promise(r => setTimeout(r, 700))
+
+        if (emailInput.value === DEMO_EMAIL && pwdInput.value === DEMO_PWD){
+          messageEl.textContent = 'Login successful (mock)'
+          messageEl.classList.add('success')
+
+          try{
+            if (rememberChk.checked) localStorage.setItem('rememberedEmail', emailInput.value)
+            else localStorage.removeItem('rememberedEmail')
+          }catch(e){console.warn('localStorage not available', e)}
+
+          setTimeout(() => {
+            document.body.innerHTML = '\n              <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:Segoe UI,Roboto,Helvetica,Arial,sans-serif;">\n                <div style="max-width:780px;padding:28px;text-align:center;">\n                  <h1>Welcome</h1>\n                  <p>You are signed in as <strong>' + escapeHtml(emailInput.value) + '</strong>.</p>\n                  <p><button id="signOut" class="primary">Sign out</button></p>\n                </div>\n              </main>\n            '
+            // re-add minimal styles for sign out button
+            const style = document.createElement('style')
+            style.textContent = '.primary{width:160px;background:var(--accent);color:#fff;padding:10px 12px;border-radius:8px;border:0;font-weight:600;cursor:pointer}'
+            document.head.appendChild(style)
+            const btn = document.getElementById('signOut')
+            if (btn) btn.addEventListener('click', () => location.reload())
+          }, 700)
+
+        } else {
+          messageEl.textContent = 'Invalid email or password.'
+        }
+
+        submitBtn.disabled = false
+        submitBtn.textContent = 'Sign in'
+      }
+
+      form.addEventListener('submit', handleSubmit)
+
+      function escapeHtml(str){
+        return str.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]))
+      }
+
+      // small startup log
+      try{ console.log('Simple login demo ready. Use user@example.com / password123') }catch(e){}
+    })();
+  </script>
+</body>
+</html>
